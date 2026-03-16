@@ -1,8 +1,9 @@
 import pygame
+from asteroids import Asteroid
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from logger import log_state
 from player import Player
-
+from asteroidfield import AsteroidField
 
 def main():
     game_loop = True
@@ -16,7 +17,18 @@ def main():
     clock = pygame.time.Clock()
     dt = 0
 
-    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    # Group class is a container that holds and manages multiple game objects.
+    # You can think of them as a sort of Venn diagram. 
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+
+    Player.containers = (updatable, drawable)
+    Asteroid.containers = (updatable, drawable, asteroids)
+    AsteroidField.containers = (updatable,)
+
+    Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    AsteroidField()
 
     # Start game_loop
     while game_loop:
@@ -24,8 +36,20 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+        # first update all the game objects
+        for sprite in updatable:
+            sprite.update(dt)
+            
+        # Fill the screen
         screen.fill("black")
-        player.draw(screen)
+        
+        # Draw all sprites
+        for sprite in drawable:
+            sprite.draw(screen)
+        
+        
+        # player.draw(screen)
+        # player.update(dt)
         pygame.display.flip()
         dt = clock.tick(60) / 1000
 
