@@ -1,11 +1,12 @@
 import sys
 
 import pygame
-from asteroids import Asteroid
+from asteroid import Asteroid
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from logger import log_state, log_event
 from player import Player
 from asteroidfield import AsteroidField
+from shot import Shot
 
 def main():
     game_loop = True
@@ -23,11 +24,13 @@ def main():
     # You can think of them as a sort of Venn diagram. 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()
+    asteroid = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
-    Asteroid.containers = (updatable, drawable, asteroids)
+    Asteroid.containers = (updatable, drawable, asteroid)
     AsteroidField.containers = (updatable,)
+    Shot.containers = (updatable, drawable, shots)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     AsteroidField()
@@ -43,7 +46,7 @@ def main():
             sprite.update(dt)
         
         # log if there is a collision between the player and any asteroid
-        for sprite in asteroids:
+        for sprite in asteroid:
             if sprite.collides_with(player):
                log_event("player_hit")
                print("Game Over!")

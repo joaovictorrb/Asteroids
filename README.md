@@ -15,6 +15,13 @@ Using pygame and a virtual environment to develop the game.
 
 
 Run project:
+1. Inside the project run:
+```shell
+source .venv/bin/activate
+```
+To activate the virtual environment
+
+2. Run the project:
 ```shell
 uv run main.py
 ```

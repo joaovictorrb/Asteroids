@@ -1,12 +1,14 @@
 import pygame
 from circleshape import CircleShape
-from constants import LINE_WIDTH, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED
+from constants import LINE_WIDTH, PLAYER_RADIUS, PLAYER_SHOOT_COOLDOWN_SECONDS, PLAYER_SHOT_SPEED, PLAYER_TURN_SPEED, PLAYER_SPEED, SHOT_RADIUS
+from shot import Shot
 
 
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
+        self.shot_cdr = 0
 
     # in the Player class
     def triangle(self):
@@ -31,7 +33,8 @@ class Player(CircleShape):
         
     def update(self, dt):
         keys = pygame.key.get_pressed()
-
+        self.shot_cdr -= dt
+        
         if keys[pygame.K_LEFT]:
             self.rotate(-dt)
         if keys[pygame.K_RIGHT]:
@@ -40,6 +43,12 @@ class Player(CircleShape):
             self.move(dt)
         if keys[pygame.K_DOWN]:
             self.move(-dt)
+        if keys[pygame.K_SPACE]:
+            if self.shot_cdr >= 0:
+                pass
+            else: 
+                self.shot_cdr = PLAYER_SHOOT_COOLDOWN_SECONDS
+                self.shoot()
     
     def move(self, dt):
         # a unit vector in a normed vector space is a vector 
@@ -102,3 +111,9 @@ class Player(CircleShape):
 
             # all axes tested, no separating axis found — shapes are colliding
             return True
+        
+    def shoot(self):
+        # create a new shot at the player's position, moving in the direction the player is facing
+        new_shot = Shot(self.position.x, self.position.y)
+        # .rotate() the vector in the direction the player is facing.
+        new_shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOT_SPEED
