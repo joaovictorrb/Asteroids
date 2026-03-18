@@ -57,7 +57,7 @@ def main():
             for shot in shots:
                 if sprite.collides_with(shot):
                     log_event("asteroid_shot")
-                    sprite.kill()
+                    sprite.split()
 
         # Fill the screen
         screen.fill("black")
