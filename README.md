@@ -15,11 +15,10 @@ Using pygame and a virtual environment to develop the game.
 
 
 Run project:
-1. Inside the project run:
+1. 1. Navigate to the project folder, activate the virtual environment, and run the following:
 ```shell
 source .venv/bin/activate
 ```
-To activate the virtual environment
 
 2. Run the project:
 ```shell
