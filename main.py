@@ -45,12 +45,19 @@ def main():
         for sprite in updatable:
             sprite.update(dt)
         
-        # log if there is a collision between the player and any asteroid
         for sprite in asteroid:
+            # log if there is a collision between the player and any asteroid
+            # if there is a collision, kill the player and end the game
             if sprite.collides_with(player):
                log_event("player_hit")
                print("Game Over!")
                sys.exit()
+            # log if there is a collision between any asteroid and any shot
+            # if there is a collision, kill the asteroid and the shot
+            for shot in shots:
+                if sprite.collides_with(shot):
+                    log_event("asteroid_shot")
+                    sprite.kill()
 
         # Fill the screen
         screen.fill("black")
