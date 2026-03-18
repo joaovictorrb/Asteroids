@@ -23,6 +23,8 @@ class Player(CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
+        # draw the circle hitbox in red for comparison
+        pygame.draw.circle(screen, "red", (int(self.position.x), int(self.position.y)), self.radius, 1)
 
     def rotate(self, dt):
         self.rotation += dt * PLAYER_TURN_SPEED
@@ -55,3 +57,48 @@ class Player(CircleShape):
         rotated_vector = unit_vector.rotate(self.rotation)
         rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
         self.position+=rotated_with_speed_vector
+    
+    # defining the exact collision detection between the player and the asteroids
+    def collides_with(self, other):
+        # get vertices
+        verts = self.triangle()
+        
+        for i in range(len(verts)):
+            # get two adjacent vertices to form one edge of the triangle
+            edge = verts[(i + 1) % len(verts)] - verts[i]
+
+            # the separating axis is perpendicular to the edge
+            # rotating (x, y) by 90 degrees gives (-y, x)
+            axis = pygame.Vector2(-edge.y, edge.x).normalize()
+
+            # project each triangle vertex onto the axis (dot product = scalar position along axis)
+            dots = [v.dot(axis) for v in verts]
+            tri_min, tri_max = min(dots), max(dots)
+
+            # project the circle onto the same axis
+            # the circle's projection is its center +/- its radius
+            center_proj = other.position.dot(axis)
+            circle_min = center_proj - other.radius
+            circle_max = center_proj + other.radius
+
+            # if the two projections don't overlap, there's a gap — no collision possible
+            if tri_max < circle_min or circle_max < tri_min:
+                return False
+
+            # extra axis: from the circle center toward the closest triangle vertex
+            # this catches corner cases where edge normals alone miss a separation
+            closest = min(verts, key=lambda v: v.distance_to(other.position))
+            axis = (other.position - closest).normalize()
+
+            dots = [v.dot(axis) for v in verts]
+            tri_min, tri_max = min(dots), max(dots)
+
+            center_proj = other.position.dot(axis)
+            circle_min = center_proj - other.radius
+            circle_max = center_proj + other.radius
+
+            if tri_max < circle_min or circle_max < tri_min:
+                return False
+
+            # all axes tested, no separating axis found — shapes are colliding
+            return True
