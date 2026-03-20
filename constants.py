@@ -1,8 +1,10 @@
 # Screen
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-
 LINE_WIDTH = 2
+
+## Screen Menu
+TEXT_COLOR = (255,255,255)
 
 # Player
 PLAYER_RADIUS = 20
