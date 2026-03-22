@@ -1,27 +1,13 @@
 import sys
 import pygame
-import button
-from asteroid import Asteroid
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TEXT_COLOR
-from logger import log_state, log_event
-from player import Player
-from asteroidfield import AsteroidField
-from shot import Shot
-# Define font
-font = pygame.font.SysFont("Arial", 32)
-
-# Load button images
-resume_img = pygame.image.load("assets/btn_resume.png").convert_alpha()
-
-# Create button instances
-resume_button = button.Button(SCREEN_WIDTH / 2 - resume_img.get_width() / 2, SCREEN_HEIGHT / 2 - resume_img.get_height() / 2, resume_img, 1)
-
-
-def draw_text(text, font, x, y, screen):
-    img = font.render(text, True, TEXT_COLOR)
-    screen.blit(img, (x, y))
+from src.actor.asteroid.asteroid import Asteroid
+from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, TEXT_COLOR
+from src.utils.logger import log_state, log_event
+from src.actor.player.player import Player
+from src.actor.asteroid.asteroidfield import AsteroidField
+from src.actor.player.shot import Shot
+from src.components.menu.menu import Menu
     
-
 def main():
     pygame.init()
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -33,7 +19,7 @@ def main():
     
     # Game variables
     game_loop = True
-    game_pause = False
+    game_pause = True
     clock = pygame.time.Clock()
     dt = 0
     
@@ -52,15 +38,17 @@ def main():
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     AsteroidField()
 
+    menu = Menu(screen)
+    
     # Start game_loop
     while game_loop:
         
         # Check if game is paused
-        if game_pause:
-            resume_button.draw(screen)
-            # Display menu
-        else:
-            draw_text("Asteroids", font, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, screen)
+#         if game_pause:
+#            print("STARTING GAME")
+# +          game_pause = False
+#         else:
+#             pass
 
         log_state()
         # Event handler
@@ -71,10 +59,16 @@ def main():
                     game_pause = True
                 if event.key==pygame.K_RETURN:
                     print("STARTING GAME")
+                    game_pause = False
             if event.type == pygame.QUIT:
                 game_loop = False
 
         pygame.display.update()
+        if game_pause:
+            menu.draw()
+            pygame.display.flip()
+            dt = clock.tick(60) / 1000
+            continue
         
         # first update all the game objects
         for sprite in updatable:
